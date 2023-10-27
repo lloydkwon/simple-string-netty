@@ -13,64 +13,30 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static codegurus.projects.netty.NettyUtils.channelId;
+
 @ChannelHandler.Sharable
 public class ClientChannelHandler extends SimpleChannelInboundHandler<String> {
     private static final Logger LOG = LoggerFactory.getLogger(ClientChannelHandler.class);
 
-    private Map<String, Integer> temp = new HashMap<>();
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         LOG.info("channelActive "+channelId(ctx));
-        temp.put(channelId(ctx), new Integer(0));
-        ctx.channel().writeAndFlush(NettyUtils.appendNewLine("hiHello"));
+
+        ctx.channel().writeAndFlush(NettyUtils.appendNewLine("Hi Hello"));
     }
 
-    private String channelId(ChannelHandlerContext ctx) {
-        return ctx.channel().id().asShortText();
-    }
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        String channelId = channelId(ctx);
-        LOG.info("channelInactive "+channelId + " "+temp);
-        temp.remove(channelId);
+        LOG.info("channelInactive "+channelId(ctx));
     }
-
-//    @Override
-//    public void channelRead(ChannelHandlerContext ctx, Object _msg) throws Exception {
-//        String msg = (String) _msg;
-//        System.out.println("channelRead "+msg);
-//        Integer integer = temp.get(channelId(ctx));
-//        integer = integer+1;
-//        temp.put(channelId(ctx), integer);
-//        ctx.writeAndFlush(NettyUtils.appendNewLine(msg));
-//    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
-        String channelId = channelId(ctx);
-//        LOG.info("channelRead0 "+msg);
-//        System.out.println("channelRead0 "+channelId+" "+msg+" "+temp);
-        Integer integer = temp.get(channelId);
-        integer = integer+1;
-        temp.put(channelId, integer);
 
-//        if (integer >= 100000) {
-//
-//            ctx.close();
-//        }
-
-        int index = msg.indexOf("_");
-
-        String _msg = null;
-        if (index == -1) {
-            _msg = msg;
-        } else {
-            _msg = msg.substring(0, index);
-        }
-
-
-        ctx.writeAndFlush(NettyUtils.appendNewLine(_msg+"_"+integer));
-//        ctx.writeAndFlush(NettyUtils.appendNewLine(msg+"_"+integer));
+        ctx.writeAndFlush(NettyUtils.appendNewLine(msg));
     }
 
     @Override

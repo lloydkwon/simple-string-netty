@@ -8,6 +8,11 @@ import io.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static codegurus.projects.netty.NettyUtils.channelId;
+
 
 @ChannelHandler.Sharable
 public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
@@ -15,23 +20,43 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<String> {
 
     private static final ByteBuf HEARTBEAT = Unpooled.unreleasableBuffer(Unpooled.copiedBuffer("HEARTBEAT", CharsetUtil.UTF_8));
 
-    private long count = 0;
+    private Map<String, Integer> temp = new HashMap<>();
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         LOG.info("channelActive "+channelId(ctx));
     }
-    private String channelId(ChannelHandlerContext ctx) {
-        return ctx.channel().id().asShortText();
-    }
+
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        LOG.info("channelInactive "+channelId(ctx));
+        String channelId = channelId(ctx);
+        LOG.info("channelInactive "+channelId + " "+temp);
+        temp.remove(channelId);
     }
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String input) throws Exception {
+        String channelId = channelId(ctx);
+        Integer integer = null;
+        if (temp.containsKey(channelId)) {
+            integer = temp.get(channelId);
+        } else {
+            integer = new Integer(0);
+        }
 
-        ChannelFuture channelFuture = ctx.channel().writeAndFlush(NettyUtils.appendNewLine(input));
-        if (++count % 100000 == 0) {
+        integer = integer+1;
+        temp.put(channelId, integer);
+
+        int index = input.indexOf("_");
+
+        String _msg = null;
+        if (index == -1) {
+            _msg = input;
+        } else {
+            _msg = input.substring(0, index);
+        }
+
+        ChannelFuture channelFuture = ctx.channel().writeAndFlush(NettyUtils.appendNewLine(_msg+"_"+integer));
+        if (integer % 100000 == 0) {
             LOG.info("channelRead0 "+input);
             channelFuture.addListener(ChannelFutureListener.CLOSE);
 
