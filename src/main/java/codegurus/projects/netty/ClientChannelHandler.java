@@ -1,8 +1,13 @@
 package codegurus.projects.netty;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +16,7 @@ import java.util.Map;
 @ChannelHandler.Sharable
 public class ClientChannelHandler extends SimpleChannelInboundHandler<String> {
     private static final Logger LOG = LoggerFactory.getLogger(ClientChannelHandler.class);
+
     private Map<String, Integer> temp = new HashMap<>();
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -48,10 +54,10 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<String> {
         integer = integer+1;
         temp.put(channelId, integer);
 
-        if (integer >= 100000) {
-
-            ctx.close();
-        }
+//        if (integer >= 100000) {
+//
+//            ctx.close();
+//        }
 
         int index = msg.indexOf("_");
 
@@ -72,4 +78,6 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<String> {
         LOG.error(cause.getMessage(),cause);
         ctx.close();
     }
+
+
 }

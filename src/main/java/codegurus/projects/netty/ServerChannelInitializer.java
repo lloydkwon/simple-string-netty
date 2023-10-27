@@ -7,6 +7,9 @@ import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.ssl.SslContext;
+import io.netty.handler.timeout.IdleStateHandler;
+
+import java.util.concurrent.TimeUnit;
 
 public class ServerChannelInitializer extends ChannelInitializer<SocketChannel> {
     private static final StringDecoder DECODER = new StringDecoder();
@@ -27,6 +30,10 @@ public class ServerChannelInitializer extends ChannelInitializer<SocketChannel> 
         if (sslCtx != null) {
             pipeline.addLast(sslCtx.newHandler(ch.alloc()));
         }
+
+        //60동안 아무런 주고 받는게 없다면..
+        pipeline.addLast(new IdleStateHandler(0, 0, 60, TimeUnit.SECONDS));
+
 
         // Add the text line codec combination first,
         // the encoder and decoder are static as these are sharable
