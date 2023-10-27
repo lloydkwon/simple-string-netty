@@ -14,4 +14,4 @@
 * TODO
   * ByteToMessageDecoder 샘플 추가
   * ReplayingDecoder 샘플 추가
-  * FSM 을 이용하여 복잡한 비즈니스 로직 구현 샘플
+  * FSM 을 이용하여 복잡한 비즈니스 로직 구현 샘플 ( 과연? ^^ )
