@@ -4,7 +4,7 @@
   * 서버
   * 예외가 발생하지만 재기동
   * 문자열은 전송할 때마다 숫자를 붙여 다르게 전송.
-  * 채널별로 문자열을 10만개 받게 되면 channel close. 이후 재접속.
+  * 채널별로 문자열을 10만개 받게 되면 channel close. 
   * 60초 동안 allIdle상태가 되면 heartbeat 메세지 전송. 전송시 오류가 발생하면 channel close
 * ClientAgent
   * 클라이언트
